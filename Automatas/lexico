@@ -1,0 +1,53 @@
+const fs = require('fs');
+
+const reservadas = [
+  'SELECT', 'FROM', 'WHERE', 'ORDER BY', 'LIMIT', 'GROUP BY', 'HAVING',
+  'INSERT INTO', 'UPDATE', 'DELETE FROM', 'INNER JOIN', 'LEFT JOIN', 'RIGHT JOIN',
+  'AS', 'DISTINCT', 'BETWEEN', 'LIKE', 'AND', 'OR', 'IN', 'NOT IN'
+];
+
+const tokens = [
+  ['OPERADOR', /\*|[-+=><!]=?|\/|\bAND\b|\bOR\b/],
+  ['IDENTIFICADOR', /[a-zA-Z_][a-zA-Z0-9_]*/],
+  ['VALOR', /'[^']*'/],
+];
+
+function esPalabraReservada(palabra) {
+  return reservadas.includes(palabra.toUpperCase());
+}
+
+function analizarQuery(query) {
+  const resultados = [];
+
+  query.split(/\b/).forEach((parte) => {
+    tokens.forEach(([nombre, patron]) => {
+      const coincidencias = parte.match(patron);
+
+      if (coincidencias) {
+        coincidencias.forEach((coincidencia) => {
+          if (nombre === 'IDENTIFICADOR' && esPalabraReservada(coincidencia)) {
+            resultados.push({ nombre: coincidencia.toUpperCase(), valor: 'palabra reservada' });
+          } else {
+            resultados.push({ nombre, valor: coincidencia.trim() });
+          }
+        });
+      }
+    });
+  });
+
+  return resultados;
+}
+
+const queryEjemplo = "SELECT * FROM usuarios WHERE nombre = 'Juan'";
+const resultado = analizarQuery(queryEjemplo);
+
+// Crear un contenido para el archivo .txt
+const contenidoArchivo = resultado.map(token => `${token.nombre}: ${token.valor}`).join('\n');
+
+// Especificar la ruta del archivo
+const rutaArchivo = 'resultados.txt';
+
+// Escribir en el archivo
+fs.writeFileSync(rutaArchivo, contenidoArchivo);
+
+console.log(`Resultados escritos en ${rutaArchivo}`);

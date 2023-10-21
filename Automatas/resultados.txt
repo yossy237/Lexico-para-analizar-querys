@@ -1,0 +1,8 @@
+SELECT: palabra reservada
+OPERADOR: *
+FROM: palabra reservada
+IDENTIFICADOR: usuarios
+WHERE: palabra reservada
+IDENTIFICADOR: nombre
+OPERADOR: =
+IDENTIFICADOR: Juan
